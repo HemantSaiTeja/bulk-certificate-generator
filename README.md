@@ -1,16 +1,19 @@
 # Bulk Certificate Generator
 
-A Python backend application that generates PDF certificates in bulk using FastAPI. It validates recipient information, tracks generation jobs, handles individual certificate failures, and provides APIs to retrieve generated certificates.
+A Python-based bulk certificate generation application with a FastAPI backend and a responsive web dashboard called **CertiFlow**. It generates personalized PDF certificates for multiple recipients using manual entry or CSV upload. The application validates recipient information, tracks generation jobs, handles individual certificate failures, and provides APIs to retrieve and download generated certificates.
 
 ## Features
 
 - Generate certificates for multiple recipients in one request
+- Add recipients manually through the web dashboard
+- Upload CSV files for bulk recipient input
 - Validate recipient data and email addresses
-- Generate PDF certificates using a predefined template
+- Generate personalized PDF certificates using a predefined template
 - Store jobs and recipient records in SQLite
 - Track job status and success/failure counts
 - Handle individual certificate-generation failures independently
 - List generation results and download certificates
+- Responsive CertiFlow dashboard with certificate design preview
 - Automated API tests using Pytest
 
 ## Technology Stack
@@ -21,6 +24,7 @@ A Python backend application that generates PDF certificates in bulk using FastA
 - **ORM:** SQLAlchemy
 - **Validation:** Pydantic
 - **PDF Generation:** ReportLab
+- **Frontend:** HTML, CSS, JavaScript
 - **Testing:** Pytest and FastAPI TestClient
 
 ## Project Structure
@@ -36,7 +40,8 @@ bulk-certificate-generator/
 │   │   └── jobs.py
 │   ├── services/
 │   │   └── certificate_generator.py
-│   └── templates/
+│   └── static/
+│       └── index.html
 ├── tests/
 │   └── test_jobs.py
 ├── generated_certificates/
@@ -77,24 +82,44 @@ Start the development server:
 python -m uvicorn app.main:app --reload
 ```
 
-Open the interactive API documentation:
+Open the following URLs in your browser:
 
-http://127.0.0.1:8000/docs
+- **Web Dashboard:** http://127.0.0.1:8000/
+- **Interactive API Documentation:** http://127.0.0.1:8000/docs
+- **Health Check:** http://127.0.0.1:8000/health
 
 The application uses a local SQLite database and stores generated PDF files locally.
+
+## Using the Web Dashboard
+
+1. Open the CertiFlow dashboard in your browser.
+2. Add recipient details manually or upload a CSV file.
+3. Ensure the CSV contains the columns `name`, `email`, and `certificate_title`.
+4. Submit the certificate-generation request.
+5. Review the successful and failed generation counts.
+6. Download the generated certificates and verify their contents.
+
+### Sample CSV Format
+
+```csv
+name,email,certificate_title
+Aarav Sharma,aarav.sharma@example.com,Python Programming
+Priya Reddy,priya.reddy@example.com,Data Analytics Fundamentals
+Rahul Verma,rahul.verma@example.com,Web Development Bootcamp
+```
 
 ## API Endpoints
 
 | Method | Endpoint | Description |
 |---|---|---|
-| GET | `/` | Welcome message |
+| GET | `/` | Serves the CertiFlow web dashboard |
 | GET | `/health` | Health check |
 | POST | `/api/jobs/` | Submit a bulk certificate-generation job |
 | GET | `/api/jobs/{job_id}/` | Retrieve job status and counts |
 | GET | `/api/jobs/{job_id}/certificates/` | List recipient results |
 | GET | `/api/certificates/{certificate_id}/download/` | Download an individual PDF |
 
-## Example Request
+## Example API Request
 
 Submit a POST request to `/api/jobs/` with the following JSON body:
 
@@ -117,7 +142,7 @@ Submit a POST request to `/api/jobs/` with the following JSON body:
 
 ### Example Response
 
-A successful request returns HTTP `201 Created` with a response similar to:
+A successful request returns HTTP 201 Created with a response similar to:
 
 ```json
 {
@@ -156,7 +181,7 @@ The current test suite covers:
 
 ### Request and Validation Flow
 
-FastAPI receives HTTP requests, and Pydantic validates the incoming recipient data before the generation workflow begins.
+FastAPI receives HTTP requests, and Pydantic validates incoming recipient data before the generation workflow begins.
 
 ### Database Layer
 
@@ -164,7 +189,11 @@ SQLAlchemy manages the SQLite database. A generation job represents a bulk reque
 
 ### Certificate Generation
 
-The certificate-generation service uses ReportLab to create a PDF for each recipient from a predefined template.
+The certificate-generation service uses ReportLab to create a personalized PDF for each recipient from a predefined template.
+
+### Frontend
+
+The CertiFlow dashboard provides manual recipient entry, CSV upload, generation-result summaries, and certificate download links. It communicates with the backend through HTTP API requests.
 
 ### Failure Handling
 
@@ -176,16 +205,16 @@ The current implementation uses synchronous processing. This keeps the initial a
 
 ## Design Decisions
 
-- **FastAPI:** Provides a lightweight framework for building REST APIs and automatic interactive documentation.
+- **FastAPI:** Provides a lightweight framework for REST APIs and automatic interactive documentation.
 - **SQLite:** Avoids requiring a separate database server during local development.
 - **SQLAlchemy:** Separates database operations from API logic.
-- **ReportLab:** Generates PDF certificates programmatically without requiring an external document-generation service.
+- **ReportLab:** Generates PDF certificates programmatically.
 - **Per-recipient status tracking:** Allows successful and failed certificate generations to be reported independently.
 - **Synchronous processing:** Keeps the initial implementation simple. Background processing would be preferable for larger workloads.
 
 ## Learning Outcomes
 
-This project demonstrates practical experience with REST API development, relational database integration, request validation, PDF generation, error handling, automated testing, and Git/GitHub workflows.
+This project demonstrates practical experience with REST API development, relational database integration, request validation, PDF generation, frontend integration, error handling, automated testing, and Git/GitHub workflows.
 
 ## Future Scope
 
